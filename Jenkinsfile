@@ -6,7 +6,7 @@ pipeline {
         IMAGE_NAME = 'productpage'
         REPO = 'taliadh'
         VERSION = "ver${env.BUILD_NUMBER}"
-        WORK_DIR = "."
+        WORK_DIR = "./"
     }
     stages {
         stage('SCA') {
