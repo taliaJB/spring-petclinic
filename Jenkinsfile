@@ -33,7 +33,7 @@ pipeline {
                 }
             }
         }
-        stage('Login to Registry') {
+/*        stage('Login to Registry') {
             steps {
                 sh '''
                 echo $DOCKERHUB_CREDENTIALS_USR
@@ -49,6 +49,20 @@ pipeline {
                 docker push ${REPO}/${IMAGE_NAME}:${VERSION}
                 docker push ${REPO}/${IMAGE_NAME}:latest
                 '''
+            }
+        }*/
+
+        stage('Push') {
+            steps {
+                script {
+                    docker.withRegistry("", "${CREDENTIALS_ID}") {
+                        sh '''
+                        docker tag ${REPO}/${IMAGE_NAME}:${VERSION} ${REPO}/${IMAGE_NAME}:latest
+                        docker push ${REPO}/${IMAGE_NAME}:${VERSION}
+                        docker push ${REPO}/${IMAGE_NAME}:latest
+                        '''
+                    }
+                }
             }
         }
     }
