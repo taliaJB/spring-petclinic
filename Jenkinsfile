@@ -14,7 +14,6 @@ pipeline {
                 script {
                     sh '''
                     docker build -f ${WORK_DIR}${DOCKER_FILE} --target sca --tag ${IMAGE_NAME}:${VERSION}-sca ${WORK_DIR}
-                    docker run --rm ${IMAGE_NAME}:${VERSION}-sca
                     '''
                 }
             }
