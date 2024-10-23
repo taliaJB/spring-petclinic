@@ -10,7 +10,7 @@ pipeline {
         WORK_DIR = "./"
     }
     stages {
-        stage('SCA') {
+        stage('Static Code Analysis') {
             steps {
                 script {
                     sh '''
@@ -19,7 +19,7 @@ pipeline {
                 }
             }
         }
-        stage('Build'){
+        stage('Build Artifact'){
             steps {
                 script {
                     sh "docker build -f ${WORK_DIR}${DOCKER_FILE} --target build --tag ${IMAGE_NAME}:${VERSION}-build ${WORK_DIR}"
@@ -42,17 +42,13 @@ pipeline {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('Push to Registry') {
+        stage('Push Image to Registry') {
             steps {
-                script {
-                    docker.withRegistry("", "${CREDENTIALS_ID}") {
-                        sh '''
-                        docker tag ${REPO}/${IMAGE_NAME}:${VERSION} ${REPO}/${IMAGE_NAME}:latest
-                        docker push ${REPO}/${IMAGE_NAME}:${VERSION}
-                        docker push ${REPO}/${IMAGE_NAME}:latest
-                        '''
-                    }
-                }
+                sh '''
+                docker tag ${REPO}/${IMAGE_NAME}:${VERSION} ${REPO}/${IMAGE_NAME}:latest
+                docker push ${REPO}/${IMAGE_NAME}:${VERSION}
+                docker push ${REPO}/${IMAGE_NAME}:latest
+                '''
             }
         }
     }
