@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        CREDENTIALS_ID = 'dh_proj'
+        CREDENTIALS_ID = 'dh-petclinic'
         DOCKER_FILE = 'Dockerfile'
-        IMAGE_NAME = 'productpage'
+        IMAGE_NAME = 'petclinic'
         REPO = 'taliadh'
         VERSION = "ver${env.BUILD_NUMBER}"
         WORK_DIR = "./"
@@ -14,7 +14,7 @@ pipeline {
                 script {
                     sh '''
                     docker build -f ${WORK_DIR}${DOCKER_FILE} --target sca --tag ${IMAGE_NAME}:${VERSION}-sca ${WORK_DIR}
-                    docker run --rm ${IMAGE_NAME}:${VERSION}-test
+                    docker run --rm ${IMAGE_NAME}:${VERSION}-sca
                     '''
                 }
             }
