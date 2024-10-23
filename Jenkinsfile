@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         CREDENTIALS_ID = 'dh-petclinic'
+        DOCKERHUB_CREDENTIALS = credentials('dh-petclinic')
         DOCKER_FILE = 'Dockerfile'
         IMAGE_NAME = 'petclinic'
         REPO = 'taliadh'
@@ -32,7 +33,16 @@ pipeline {
                 }
             }
         }
-        stage('Push') {
+        stage('Login to Registry') {
+            steps {
+                sh '''
+                echo $DOCKERHUB_CREDENTIALS_USR
+                echo $DOCKERHUB_CREDENTIALS_PSW
+                '''
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+        stage('Push to Registry') {
             steps {
                 script {
                     docker.withRegistry("", "${CREDENTIALS_ID}") {
