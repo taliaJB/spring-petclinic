@@ -1,4 +1,4 @@
-# Phase 1 - Generate classes with mvn;
+# Phase 1 - Run source code analysis using sonarqube;
 FROM maven:3.9-eclipse-temurin-17-alpine AS sca
 WORKDIR /petclinic
 COPY pom.xml .
@@ -21,5 +21,5 @@ FROM openjdk:17-jdk-alpine3.14 AS deploy
 WORKDIR /code
 COPY --from=build /petclinic/target/*.jar .
 EXPOSE 8080
-RUN ls
-CMD java -jar *.jar
+#CMD java -jar *.jar
+CMD java -jar -Dspring.profiles.active=mysql *.jar
