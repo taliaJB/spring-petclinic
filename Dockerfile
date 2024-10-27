@@ -21,4 +21,5 @@ FROM openjdk:17-jdk-alpine3.14 AS deploy
 WORKDIR /code
 COPY --from=build /petclinic/target/*.jar .
 EXPOSE 8080
-CMD java -jar *.jar
+#CMD java -jar *.jar
+CMD java -jar -Dspring.profiles.active=mysql *.jar
