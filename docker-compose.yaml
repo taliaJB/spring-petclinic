@@ -1,0 +1,108 @@
+services:
+
+  jenkins-master:
+    build:
+      args:
+        - JENKINS_HOME
+        - JENKINS_PASS
+        - JENKINS_USER
+      context: ./jenkins/master
+      dockerfile: Dockerfile
+    container_name: $JENKINS_HOST
+    dns: 8.8.8.8
+    environment:
+      - JAR_CLI
+      - JENKINS_HOST
+      - JENKINS_PORT
+      - JENKINS_PROTOCOL
+      - JENKINS_JAR_PATH
+    healthcheck:
+      interval: 10s
+      retries: 6
+      start_period: 30s
+      test: curl --output /dev/null --silent --fail "${JENKINS_PROTOCOL}://${JENKINS_HOST}:${JENKINS_PORT}${JENKINS_JAR_PATH}${JAR_CLI}" || exit 1
+      timeout: 10s
+    networks:
+      - net-ci
+    ports:
+      - '$JENKINS_PORT:$JENKINS_PORT'
+      - '50000:50000'
+    privileged: true
+    profiles:
+      - jenkins
+      - master
+    restart: unless-stopped
+    user: root
+
+  jenkins-master-setup:
+    build:
+      context: ./jenkins/setup/
+      dockerfile: Dockerfile
+    container_name: jenkins-setup
+    depends_on:
+      jenkins-node:
+        condition: service_healthy
+    environment:
+      - JAR_CLI
+      - JENKINS_HOST
+      - JENKINS_JAR_PATH
+      - JENKINS_PASS
+      - JENKINS_PORT
+      - JENKINS_PROTOCOL
+      - JENKINS_USER
+      - JOB_NAME
+      - LOG_SUCCESS
+    healthcheck:
+      interval: 10s
+      retries: 6
+      start_period: 30s
+      test: ls "$LOG_SUCCESS" 2>/dev/null || exit 1
+      timeout: 10s
+    networks:
+      - net-ci
+    profiles:
+      - jenkins
+      - setup
+
+  jenkins-node:
+    build:
+      args:
+        - JENKINS_HOME
+      context: ./jenkins/node
+      dockerfile: Dockerfile
+    container_name: jenkins-node
+    depends_on:
+      jenkins-master:
+        condition: service_healthy
+    environment:
+      - JAR_AGENT
+      - JAR_CLI
+      - JENKINS_HOST
+      - JENKINS_JAR_PATH
+      - JENKINS_PASS
+      - JENKINS_PORT
+      - JENKINS_PROTOCOL
+      - JENKINS_USER
+      - LOG_SUCCESS
+      - NODE_NAME
+    healthcheck:
+      interval: 10s
+      retries: 6
+      start_period: 30s
+      test: ls "$LOG_SUCCESS" 2>/dev/null || exit 1
+      timeout: 10s
+    networks:
+      - net-ci
+    profiles:
+      - jenkins
+      - node
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+name: petclinic
+
+networks:
+  net-ci:
+    driver: bridge
+    external: false
+    name: net-ci
