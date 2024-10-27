@@ -1,0 +1,51 @@
+# Default values for spring-petclinic.
+# This is a YAML-formatted file.
+
+# Configure the deployment for the java app;
+app:
+  container:
+    image:
+      name: 'taliadh/petclinic'
+      tag: 'latest'
+      pullPolicy: Always
+    name: 'petclinic-app'
+    port: 8080
+  label: 'petclinic-app'
+  labelSelector: 'petclinic-app'
+  name: '-deploy-app'
+  replicas: 1
+  # Configure the service used to expose the java app;
+  service:
+    label: 'petclinic-app'
+    labelSelector: 'petclinic-app'
+    name: '-svc-app'
+    port:
+       external: 80
+    type: 'ClusterIP'
+
+# Configure the deployment for the COTS db; 
+db:
+  container:
+    image:
+      name: mysql
+      tag: 5.7
+    name: 'petclinic-db'
+    port: 3306
+  env:
+    allowEmptyPassword: 'true'
+    database: 'petclinic'
+    password: 'petclinic'
+    rootPassword: ''
+    user: 'petclinic'
+  label: 'petclinic-db'
+  labelSelector: 'petclinic-db'
+  name: '-deploy-db'
+  replicas: 1
+  # Configure the service used to expose the db app;
+  service:
+    label: 'petclinic-db'
+    labelSelector: 'petclinic-db'
+    name: '-scv-db' 
+    port:
+       external: 3306
+    type: 'ClusterIP'
