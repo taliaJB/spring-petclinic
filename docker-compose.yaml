@@ -28,8 +28,6 @@ services:
       - '$JENKINS_PORT:$JENKINS_PORT'
       - '50000:50000'
     privileged: true
-    profiles:
-      - jenkins
       - master
     restart: unless-stopped
     user: root
@@ -60,9 +58,6 @@ services:
       timeout: 10s
     networks:
       - net-ci
-    profiles:
-      - jenkins
-      - setup
 
   jenkins-node:
     build:
@@ -93,9 +88,6 @@ services:
       timeout: 10s
     networks:
       - net-ci
-    profiles:
-      - jenkins
-      - node
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
